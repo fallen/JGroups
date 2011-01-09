@@ -126,10 +126,9 @@
                deprecation="off"
                optimize="off"
                listfiles="false"
-               includes="org/jgroups/**"
-               excludes="org/jgroups/tests/junit/,org/jgroups/tests/junit-functional/,org/jgroups/tests/stress">
+               includes="org/jgroups/**">
             <exclude name="**/obsolete/**"/>
-            <exclude name="**/demo/**"/>
+            <exclude name="**/demos/**"/>
             <exclude name="**/jmx/**"/>
             <exclude name="**/tests/**"/>
             <exclude name="**/junit/**"/>

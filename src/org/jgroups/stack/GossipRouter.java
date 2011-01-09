@@ -258,11 +258,13 @@ public class GossipRouter {
     public void start() throws Exception {
         if(running.compareAndSet(false, true)) {           
             if(jmx && !registered) {
+		/*
                 MBeanServer server=Util.getMBeanServer();
                 JmxConfigurator.register(this, server, "jgroups:name=GossipRouter");
+		*/
                 registered=true;
-            }
-    
+            } 
+
             if(bindAddressString != null) {
                 bindAddress=InetAddress.getByName(bindAddressString);
                 srvSock=new ServerSocket(port, backlog, bindAddress);

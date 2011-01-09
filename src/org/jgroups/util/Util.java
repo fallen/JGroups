@@ -3557,7 +3557,7 @@ public class Util {
 
 
     public static void registerChannel(JChannel channel, String name) {
-        MBeanServer server=Util.getMBeanServer();
+        /*MBeanServer server=Util.getMBeanServer();
         if(server != null) {
             try {
                 JmxConfigurator.registerChannel(channel,
@@ -3569,7 +3569,7 @@ public class Util {
             catch(Exception e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
 
