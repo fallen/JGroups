@@ -9,6 +9,7 @@ import org.jgroups.logging.Log;
 import org.jgroups.logging.LogFactory;
 
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TimeScheduler2 implements TimeScheduler, Runnable  {
     private final ThreadManagerThreadPoolExecutor pool;
 
-    private final ConcurrentSkipListMap<Long,Entry> tasks=new ConcurrentSkipListMap<Long,Entry>();
+    private final ConcurrentHashMap<Long,Entry> tasks=new ConcurrentHashMap<Long,Entry>();
 
     private Thread runner=null;
 
@@ -324,7 +325,14 @@ public class TimeScheduler2 implements TimeScheduler, Runnable  {
         try {
             if(!running)
                 return;
-            next_execution_time=tasks.firstKey();
+
+	    next_execution_time = 0;
+
+            Enumeration<Long> e = tasks.keys();
+	    if (e.hasMoreElements()) {
+                next_execution_time = e.nextElement();
+	    }
+	    
             long sleep_time=next_execution_time - System.currentTimeMillis();
             tasks_available.await(sleep_time, TimeUnit.MILLISECONDS);
         }
