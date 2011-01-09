@@ -285,8 +285,25 @@ public class TimeScheduler2 implements TimeScheduler, Runnable  {
 
 
     protected void _run() {
-        ConcurrentNavigableMap<Long,Entry> head_map; // head_map = entries which are <= curr time (ready to be executed)
-        if(!(head_map=tasks.headMap(System.currentTimeMillis(), true)).isEmpty()) {
+//        ConcurrentNavigableMap<Long,Entry> head_map; // head_map = entries which are <= curr time (ready to be executed)
+//	head_map = new ConcurrentNavigableMap<Long,Entry>();
+	final LinkedList<Long>  keys = new LinkedList<Long>();
+
+	for (Enumeration e = tasks.keys() ; e.hasMoreElements() ;) {
+		final Object key = e.nextElement();
+		final Entry val = tasks.get(key);
+		if ((Long)key <= System.currentTimeMillis()) {
+			pool.execute(new Runnable() {
+				public void run() {
+					val.execute();
+				}
+			});	
+			keys.add((Long)key);
+		}
+		tasks.keySet().removeAll(keys);	
+	}
+
+/*        if(!(head_map=tasks.headMap(System.currentTimeMillis(), true)).isEmpty()) {
             final List<Long> keys=new LinkedList<Long>();
             for(Map.Entry<Long,Entry> entry: head_map.entrySet()) {
                 final Long key=entry.getKey();
@@ -300,7 +317,7 @@ public class TimeScheduler2 implements TimeScheduler, Runnable  {
             }
             tasks.keySet().removeAll(keys);
         }
-
+*/
         if(tasks.isEmpty()) {
             no_tasks.compareAndSet(false, true);
             waitFor(); // sleeps until time elapses, or a task with a lower execution time is added
