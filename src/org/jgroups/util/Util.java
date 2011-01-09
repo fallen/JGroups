@@ -3305,11 +3305,12 @@ public class Util {
         Enumeration intfs=NetworkInterface.getNetworkInterfaces();
         while(intfs.hasMoreElements()) {
             NetworkInterface intf=(NetworkInterface)intfs.nextElement();
-            if(intf.isUp()) {
+/*            if(intf.isUp()) { */
                 address=getAddress(intf, scope) ;
                 if(address != null)
                     return address;
-            }
+/*            } */
+
         }
         return null ;
     }
