@@ -129,6 +129,10 @@
                includes="org/jgroups/**"
                excludes="org/jgroups/tests/junit/,org/jgroups/tests/junit-functional/,org/jgroups/tests/stress">
             <exclude name="**/obsolete/**"/>
+            <exclude name="**/demo/**"/>
+            <exclude name="**/jmx/**"/>
+            <exclude name="**/tests/**"/>
+            <exclude name="**/junit/**"/>
             <src path="${src.dir}"/>
             <src path="${other.dir}"/>
             <src path="${perf.dir}"/>
