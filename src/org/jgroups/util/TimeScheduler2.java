@@ -285,8 +285,6 @@ public class TimeScheduler2 implements TimeScheduler, Runnable  {
 
     protected void _run() {
         ConcurrentNavigableMap<Long,Entry> head_map; // head_map = entries which are <= curr time (ready to be executed)
-	head_map = new ConcurrentNavigableMap<Long,Entry>();
-
         if(!(head_map=tasks.headMap(System.currentTimeMillis(), true)).isEmpty()) {
             final List<Long> keys=new LinkedList<Long>();
             for(Map.Entry<Long,Entry> entry: head_map.entrySet()) {
