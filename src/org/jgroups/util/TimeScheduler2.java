@@ -9,7 +9,6 @@ import org.jgroups.logging.Log;
 import org.jgroups.logging.LogFactory;
 
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TimeScheduler2 implements TimeScheduler, Runnable  {
     private final ThreadManagerThreadPoolExecutor pool;
 
-    private final ConcurrentHashMap<Long,Entry> tasks=new ConcurrentHashMap<Long,Entry>();
+    private final ConcurrentSkipListMap<Long,Entry> tasks=new ConcurrentSkipListMap<Long,Entry>();
 
     private Thread runner=null;
 
@@ -285,25 +284,10 @@ public class TimeScheduler2 implements TimeScheduler, Runnable  {
 
 
     protected void _run() {
-//        ConcurrentNavigableMap<Long,Entry> head_map; // head_map = entries which are <= curr time (ready to be executed)
-//	head_map = new ConcurrentNavigableMap<Long,Entry>();
-	final LinkedList<Long>  keys = new LinkedList<Long>();
+        ConcurrentNavigableMap<Long,Entry> head_map; // head_map = entries which are <= curr time (ready to be executed)
+	head_map = new ConcurrentNavigableMap<Long,Entry>();
 
-	for (Enumeration e = tasks.keys() ; e.hasMoreElements() ;) {
-		final Object key = e.nextElement();
-		final Entry val = tasks.get(key);
-		if ((Long)key <= System.currentTimeMillis()) {
-			pool.execute(new Runnable() {
-				public void run() {
-					val.execute();
-				}
-			});	
-			keys.add((Long)key);
-		}
-		tasks.keySet().removeAll(keys);	
-	}
-
-/*        if(!(head_map=tasks.headMap(System.currentTimeMillis(), true)).isEmpty()) {
+        if(!(head_map=tasks.headMap(System.currentTimeMillis(), true)).isEmpty()) {
             final List<Long> keys=new LinkedList<Long>();
             for(Map.Entry<Long,Entry> entry: head_map.entrySet()) {
                 final Long key=entry.getKey();
@@ -317,7 +301,7 @@ public class TimeScheduler2 implements TimeScheduler, Runnable  {
             }
             tasks.keySet().removeAll(keys);
         }
-*/
+
         if(tasks.isEmpty()) {
             no_tasks.compareAndSet(false, true);
             waitFor(); // sleeps until time elapses, or a task with a lower execution time is added
@@ -343,13 +327,7 @@ public class TimeScheduler2 implements TimeScheduler, Runnable  {
             if(!running)
                 return;
 
-	    next_execution_time = 0;
-
-            Enumeration<Long> e = tasks.keys();
-	    if (e.hasMoreElements()) {
-                next_execution_time = e.nextElement();
-	    }
-	    
+	    next_execution_time=tasks.firstKey();
             long sleep_time=next_execution_time - System.currentTimeMillis();
             tasks_available.await(sleep_time, TimeUnit.MILLISECONDS);
         }
