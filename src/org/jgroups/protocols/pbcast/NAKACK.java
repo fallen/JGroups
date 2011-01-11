@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @MBean(description="Reliable transmission multipoint FIFO protocol")
 @DeprecatedProperty(names={"max_xmit_size", "eager_lock_release", "stats_list_size", "max_xmit_buf_size",
-                           "enable_xmit_time_stats", "use_range_based_retransmitter"})
+                           "enable_xmit_time_stats"})
 public class NAKACK extends Protocol implements Retransmitter.RetransmitCommand, NakReceiverWindow.Listener, TP.ProbeHandler {
 
     /** the weight with which we take the previous smoothed average into account, WEIGHT should be >0 and <= 1 */
@@ -94,7 +94,11 @@ public class NAKACK extends Protocol implements Retransmitter.RetransmitCommand,
     @Property(description="Use statistics gathered from actual retransmission times to compute new retransmission times. Default is false")
     private boolean use_stats_for_retransmission=false;
 
-    
+    @Property(description="Whether to use the old retransmitter which retransmits individual messages or the new one " +
+            "which uses ranges of retransmitted messages. Default is true. Note that this property will be removed in 3.0; " +
+            "it is only used to switch back to the old (and proven) retransmitter mechanism if issues occur")
+    private boolean use_range_based_retransmitter=true;
+
 
     /**
      * Messages that have been received in order are sent up the stack (=
@@ -1248,7 +1252,7 @@ public class NAKACK extends Protocol implements Retransmitter.RetransmitCommand,
 
 
     private NakReceiverWindow createNakReceiverWindow(Address sender, long initial_seqno, long lowest_seqno) {
-        NakReceiverWindow win=new NakReceiverWindow(sender, this, initial_seqno, lowest_seqno, timer, true,
+        NakReceiverWindow win=new NakReceiverWindow(sender, this, initial_seqno, lowest_seqno, timer, use_range_based_retransmitter,
                                                     xmit_table_num_rows, xmit_table_msgs_per_row,
                                                     xmit_table_resize_factor, xmit_table_max_compaction_time, false);
 
